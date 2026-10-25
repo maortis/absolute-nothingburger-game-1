@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://cmmwlehvgevpa"]
+
+[ext_resource type="Script" uid="uid://cvu1c2b3ucvcn" path="res://script/main menu.gd" id="1_yqeox"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m0tkw"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="Control" type="Control" unique_id=1471244567]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yqeox")
+
+[node name="Button" type="Button" parent="." unique_id=781480225]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -582.0
+offset_top = -328.0
+offset_right = 572.0
+offset_bottom = 325.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_m0tkw")
+text = "click anywhere to start
+(WASD and arrow buttons to walk, space to jump)"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
