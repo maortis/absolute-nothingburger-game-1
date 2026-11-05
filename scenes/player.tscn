@@ -348,3 +348,11 @@ layout_mode = 0
 offset_right = 54.815
 offset_bottom = 23.0
 theme_override_font_sizes/font_size = 5
+
+[node name="RayLeft" type="RayCast2D" parent="." unique_id=1842036771]
+position = Vector2(-4, 5)
+target_position = Vector2(0, 6)
+
+[node name="RayRight" type="RayCast2D" parent="." unique_id=388436761]
+position = Vector2(4, 5)
+target_position = Vector2(0, 6)
