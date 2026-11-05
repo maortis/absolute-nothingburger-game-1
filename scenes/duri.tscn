@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://script/duri.gd" id="1_duri"]
+[ext_resource type="Texture2D" path="res://assets/sprite/duri.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="shape"]
+resource_local_to_scene = true
+size = Vector2(44, 8)
+
+[node name="Duri" type="Area2D"]
+script = ExtResource("1_duri")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_repeat = 2
+position = Vector2(0, -12)
+texture = ExtResource("2_tex")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 48, 12)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(24, -4)
+shape = SubResource("shape")

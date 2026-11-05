@@ -5,6 +5,9 @@
 [ext_resource type="Script" uid="uid://cuxe2q62cwqhf" path="res://scenes/player.gd" id="3_lnu2h"]
 [ext_resource type="Texture2D" uid="uid://bcx1dbr44otg5" path="res://assets/sprite/background_0.png" id="4_lbhrr"]
 
+[ext_resource type="PackedScene" path="res://scenes/duri.tscn" id="5_duri"]
+[ext_resource type="PackedScene" path="res://ui/pause_menu.tscn" id="6_pause"]
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lbhrr"]
 texture = ExtResource("1_yqjtg")
 0:2/0 = 0
@@ -130,3 +133,12 @@ z_index = -2
 position = Vector2(453, -34.5)
 scale = Vector2(1.3833333, 1.3833333)
 texture = ExtResource("4_lbhrr")
+
+[node name="Duri" parent="." instance=ExtResource("5_duri")]
+position = Vector2(96, 0)
+
+[node name="Duri2" parent="." instance=ExtResource("5_duri")]
+position = Vector2(304, -80)
+length_tiles = 2
+
+[node name="PauseMenu" parent="." instance=ExtResource("6_pause")]
