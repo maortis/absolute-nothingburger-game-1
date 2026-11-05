@@ -17,6 +17,11 @@ const COYOTE_TIME = 0.1
 const SAFE_FALL_DISTANCE = 60.0
 const DAMAGE_PER_PIXEL = 0.5
 
+#wall jump
+const WALL_SLIDE_SPEED = 40.0
+const WALL_JUMP_VELOCITY = Vector2(200.0, -280.0)  # x = push away from wall, y = up
+const WALL_JUMP_LOCK_TIME = 0.15
+
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var healthBar = $healthbar
 @onready var sfx_jump: AudioStreamPlayer2D = $sfx_jump
@@ -28,6 +33,7 @@ var highest_y: float
 var is_dead := false
 var is_hurt := false
 var coyote_timer := 0.0
+var wall_jump_lock := 0.0
 
 
 func _ready() -> void:
@@ -61,18 +67,35 @@ func _physics_process(delta: float) -> void:
 	else:
 		coyote_timer -= delta
 
-	# Jump: pakai coyote_timer, bukan is_on_floor().
-	if Input.is_action_just_pressed("jump") and coyote_timer > 0.0:
-		velocity.y = JUMP_VELOCITY
-		coyote_timer = 0.0
-		sfx_jump.play()
-
 	var direction := Input.get_axis("move_left", "move_right")
-	if direction > 0:
-		animated_sprite.flip_h = false
-	elif direction < 0:
-		animated_sprite.flip_h = true
 
+	# Wall slide: only while pressing toward the wall and falling.
+	if is_on_wall_only() and velocity.y > 0.0:
+		if direction != 0 and sign(direction) == -sign(get_wall_normal().x):
+			velocity.y = min(velocity.y, WALL_SLIDE_SPEED)
+
+	# Jump
+	if Input.is_action_just_pressed("jump"):
+		if coyote_timer > 0.0:
+			velocity.y = JUMP_VELOCITY
+			coyote_timer = 0.0
+			sfx_jump.play()
+		elif is_on_wall_only():
+			var wall_normal := get_wall_normal()
+			velocity.x = wall_normal.x * WALL_JUMP_VELOCITY.x
+			velocity.y = WALL_JUMP_VELOCITY.y
+			wall_jump_lock = WALL_JUMP_LOCK_TIME
+			animated_sprite.flip_h = wall_normal.x < 0
+			sfx_jump.play()
+
+	# Sprite flip (skipped during wall jump lock)
+	if wall_jump_lock <= 0.0:
+		if direction > 0:
+			animated_sprite.flip_h = false
+		elif direction < 0:
+			animated_sprite.flip_h = true
+
+	# Animations
 	if is_on_floor():
 		if direction == 0:
 			animated_sprite.play("idle")
@@ -81,10 +104,13 @@ func _physics_process(delta: float) -> void:
 	else:
 		animated_sprite.play("jump")
 
-	if direction:
-		velocity.x = direction * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
+	# Horizontal movement (respects wall jump lock)
+	wall_jump_lock -= delta
+	if wall_jump_lock <= 0.0:
+		if direction:
+			velocity.x = direction * SPEED
+		else:
+			velocity.x = move_toward(velocity.x, 0, SPEED)
 
 	move_and_slide()
 
@@ -100,8 +126,10 @@ func _handle_fall_damage(was_on_floor: bool) -> void:
 				take_damage(int((fall_distance - SAFE_FALL_DISTANCE) * DAMAGE_PER_PIXEL))
 		highest_y = global_position.y
 	else:
-		# In the air: remember the highest point.
-		highest_y = min(highest_y, global_position.y)
+		if is_on_wall_only():
+			highest_y = global_position.y   # sliding on a wall resets fall distance
+		else:
+			highest_y = min(highest_y, global_position.y)
 
 
 func take_damage(amount: int) -> void:
